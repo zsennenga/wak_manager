@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from typing import List
 
@@ -12,6 +13,18 @@ class WakFile:
     header: Header
     files: List[File]
     size: int
+
+    @classmethod
+    def get_relative_paths_for_files_in_folder(cls, target_directory):
+        file_set = set()
+
+        for dir_, _, files in os.walk(target_directory):
+            for file_name in files:
+                rel_dir = os.path.relpath(dir_, target_directory)
+                rel_file = os.path.join(rel_dir, file_name)
+                file_set.add(rel_file)
+
+        return file_set
 
     @classmethod
     def _decrypt_bytes(cls, encrypted_bytes) -> bytes:
@@ -103,7 +116,7 @@ class WakFile:
 
     @classmethod
     def create_wak_from_directory(cls, root: str) -> 'WakFile':
-        files_in_directory = []  # TODO
+        files_in_directory = cls.get_relative_paths_for_files_in_folder(root)  # TODO
         file_count = len(files_in_directory)
 
         temp_filetable = WakSchema.file_table_schema()[file_count].build(
@@ -186,7 +199,7 @@ class WakFile:
             f.write(encrypted_bytes)
 
     def append_files_in_path(self, target_directory):
-        files_in_directory = []  # TODO
+        files_in_directory = self.get_relative_paths_for_files_in_folder(target_directory)
 
         for file in files_in_directory:
             self.add_file(file)
