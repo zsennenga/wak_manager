@@ -1,4 +1,6 @@
-# wak_manager
+# Wak Manager
+
+Utility for manipulating wak files for Noita
 
 Requires a recent python, probably 3.7
 
